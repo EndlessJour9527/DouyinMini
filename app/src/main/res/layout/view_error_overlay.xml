@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24px"
+    android:background="@color/black">
+
+    <ImageView
+        android:id="@+id/iv_error_icon"
+        android:layout_width="40px"
+        android:layout_height="40px"
+        android:src="@drawable/ic_wifi_off"
+        android:contentDescription="@string/error_network_title"
+        android:alpha="0.6" />
+
+    <TextView
+        android:id="@+id/tv_error_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14px"
+        android:text="@string/error_network_title"
+        android:textSize="18px"
+        android:textStyle="bold"
+        android:textColor="@color/white" />
+
+    <TextView
+        android:id="@+id/tv_error_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8px"
+        android:text="@string/error_network_message"
+        android:textSize="13px"
+        android:textColor="#99FFFFFF"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/tv_error_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16px"
+        android:text="@string/error_retry_hint"
+        android:textSize="13px"
+        android:textColor="@color/douyin_red"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/btn_retry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16px"
+        android:minWidth="96px"
+        android:minHeight="40px"
+        android:text="@string/retry"
+        android:textSize="14px" />
+
+</LinearLayout>

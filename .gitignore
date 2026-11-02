@@ -1,0 +1,32 @@
+# Local IDE and assistant state
+*.iml
+.idea/
+.vscode/
+.zcode/
+.DS_Store
+
+# Gradle / Android outputs (including standalone experiments)
+.gradle/
+**/build/
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+**/release/
+*.apk
+*.aab
+*.aix
+*.aar
+
+# Local credentials and signing material
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+*.p12
+*.pem
+
+# Local reference documents excluded from publication
+/docs/public-source.md
+/douyin-aiui-pure/README.md

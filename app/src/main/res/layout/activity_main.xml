@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.douyinmini.ui.FullscreenVideoLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fullscreen_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:gravity="center">
+
+    <!-- 眼镜物理屏 480x380 px：固定像素视口，更大设备上居中、外侧纯黑 -->
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="480px"
+        android:layout_height="380px"
+        android:background="@color/black">
+
+        <com.douyinmini.ui.CaptureWebView
+            android:id="@+id/webview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- 云台防抖输出层：开启时覆盖 WebView，GL 线程按头部姿态投影 WebView 帧 -->
+        <SurfaceView
+            android:id="@+id/stabilizer_surface"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3px"
+            android:progressTint="@color/douyin_red"
+            android:visibility="gone"
+            android:max="100" />
+
+        <com.douyinmini.ui.ErrorOverlayView
+            android:id="@+id/error_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <!-- 网页全屏视频容器：同样限制在 480x380 px 视口内 -->
+    <FrameLayout
+        android:id="@+id/video_container"
+        android:layout_width="480px"
+        android:layout_height="380px"
+        android:background="@color/black"
+        android:visibility="gone" />
+
+    <!-- 手势提示 HUD：根级最上层，全屏播放时仍可见，约 1s 后自动隐藏 -->
+    <TextView
+        android:id="@+id/hud_gesture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="12px"
+        android:background="#D9000000"
+        android:paddingStart="14px"
+        android:paddingEnd="14px"
+        android:paddingTop="6px"
+        android:paddingBottom="6px"
+        android:textColor="@color/white"
+        android:textSize="18px"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:text="播放/暂停"
+        tools:visibility="visible" />
+
+</com.douyinmini.ui.FullscreenVideoLayout>

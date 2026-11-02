@@ -1,0 +1,790 @@
+/*
+ * DouyinMini × Hongguo Glasses UI (480x380 waveguide / 640x507 CSS px)
+ * Pure #000000 background (= transparent on 显示眼镜 waveguide)
+ * Up/Down video feed only + Right-side Long-Press Command Menu
+ */
+
+html, body {
+  background: #000000 !important;
+  color: #f4f6fb !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  zoom: 1 !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* Keep underlying Douyin DOM completely collapsed in shell mode so its width/zoom never stretches viewport */
+html.hg-shell-active body > *:not(#hg-douyin-root) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  zoom: 1 !important;
+  z-index: 1 !important;
+}
+
+/* Native passthrough mode (for login / live room fallback) */
+html.hg-native-passthrough body > *:not(#hg-douyin-root) {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.hg-native-focus {
+  outline: 3px solid #f35d7b !important;
+  outline-offset: -3px !important;
+  box-shadow: 0 0 0 2px #f35d7b, 0 0 14px rgba(243, 93, 123, 0.72) !important;
+}
+
+#hg-douyin-root {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 640px !important;
+  height: 507px !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  zoom: 1 !important;
+  z-index: 2147483640 !important;
+  background: #000000 !important;
+  color: #f4f6fb !important;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans CJK SC", sans-serif !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+#hg-douyin-root *,
+#hg-douyin-root *::before,
+#hg-douyin-root *::after {
+  box-sizing: border-box !important;
+}
+
+#hg-douyin-root.is-passthrough {
+  background: transparent !important;
+  pointer-events: none !important;
+}
+
+/* ==================== Player Stage ==================== */
+.hg-player-stage {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: #000000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+#hg-douyin-root.is-passthrough .hg-player-stage {
+  display: none !important;
+}
+
+#hg-video {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  background: #000000 !important;
+  display: block !important;
+}
+
+#hg-video-preload {
+  position: fixed !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  left: -9999px !important;
+  top: -9999px !important;
+}
+
+/* Center Stage Status Toast (Paused / Loading / Exit Confirm) */
+.hg-stage-status {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px 18px;
+  border-radius: 12px;
+  background: #000000;
+  border: 1.5px solid rgba(255, 255, 255, 0.24);
+  color: #f4f6fb;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  pointer-events: none;
+  z-index: 4;
+  max-width: 82%;
+}
+
+.hg-stage-status.is-hidden {
+  display: none !important;
+}
+
+.hg-stage-status-sub {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(244, 246, 251, 0.72);
+}
+
+/* ==================== Top Overlay (Auto-hide brief peek) ==================== */
+.hg-top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 6px 10px 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.55) 68%, rgba(0, 0, 0, 0) 100%);
+  z-index: 6;
+  transition: opacity 160ms ease, transform 160ms ease;
+  pointer-events: none;
+}
+
+.hg-top-bar.is-hidden {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.hg-top-copy {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hg-author-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fe2c55;
+  text-shadow: 0 1px 2px #000;
+}
+
+.hg-title-text {
+  font-size: 22px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: #f4f6fb;
+  text-shadow: 0 1px 2px #000;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.hg-top-pills {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.hg-pill {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(244, 246, 251, 0.92);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.hg-pill.is-accent {
+  border-color: #f35d7b;
+  color: #ff7a93;
+}
+
+/* ==================== Hongguo Quick Command Menu (Right Long-Press Drawer) ==================== */
+.hg-command-menu {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  bottom: 6px;
+  width: 236px;
+  padding: 8px;
+  border-radius: 12px;
+  background: #000000;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 20;
+  overflow-y: auto;
+}
+
+.hg-command-menu.is-hidden {
+  display: none !important;
+}
+
+.hg-command-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.hg-command-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #f4f6fb;
+}
+
+.hg-command-hint {
+  font-size: 12px;
+  color: rgba(244, 246, 251, 0.62);
+}
+
+.hg-command-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hg-command-item {
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  background: #000000;
+  color: #f4f6fb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hg-command-item-val {
+  font-size: 14px;
+  font-weight: 800;
+  color: #ff7a93;
+  white-space: nowrap;
+}
+
+/* ==================== Native Passthrough Floating Pill ==================== */
+.hg-passthrough-banner {
+  position: fixed;
+  top: 6px;
+  right: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #000000;
+  border: 1.5px solid #f35d7b;
+  color: #ff7a93;
+  font-size: 14px;
+  font-weight: 700;
+  z-index: 2147483646;
+  pointer-events: none;
+}
+
+.hg-passthrough-banner.is-hidden {
+  display: none !important;
+}
+
+/* ==================== Unified Hongguo Focus Ring (#f35d7b) ==================== */
+#hg-douyin-root .is-focused {
+  border-color: #f35d7b !important;
+  box-shadow: 0 0 0 2px #f35d7b, 0 0 12px rgba(243, 93, 123, 0.68) !important;
+  transform: translateY(-1px);
+  outline: none !important;
+}
+
+/* ==================== Glasses-Adapted Douyin Login View (640x507 CSS px) ==================== */
+.hg-login-stage {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: #000000 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 10px 16px 12px !important;
+  z-index: 14 !important;
+  overflow: hidden !important;
+}
+
+.hg-login-stage.is-hidden,
+#hg-douyin-root.is-passthrough .hg-login-stage {
+  display: none !important;
+}
+
+.hg-login-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 4px 6px 8px !important;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.18) !important;
+  flex-shrink: 0 !important;
+}
+
+.hg-login-title-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.hg-login-title {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: #f4f6fb !important;
+  letter-spacing: 0.3px !important;
+}
+
+.hg-login-badge {
+  padding: 3px 10px !important;
+  border-radius: 999px !important;
+  background: #000000 !important;
+  border: 1.5px solid #f35d7b !important;
+  color: #ff7a93 !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+}
+
+.hg-login-badge.is-ok {
+  border-color: #25f4ee !important;
+  color: #25f4ee !important;
+}
+
+.hg-login-subhint {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: rgba(244, 246, 251, 0.72) !important;
+}
+
+.hg-login-body {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  padding-top: 10px !important;
+  min-height: 0 !important;
+}
+
+.hg-login-qr-col {
+  width: 244px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 8px !important;
+  border-radius: 14px !important;
+  background: #000000 !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+.hg-login-qr-card {
+  position: relative !important;
+  width: 204px !important;
+  height: 204px !important;
+  padding: 10px !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  border: 2.5px solid #f35d7b !important;
+  box-shadow: 0 0 14px rgba(243, 93, 123, 0.35) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+.hg-login-qr-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  image-rendering: pixelated !important;
+  display: block !important;
+}
+
+.hg-login-qr-img.is-hidden {
+  display: none !important;
+}
+
+.hg-login-qr-mask {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(10, 12, 18, 0.90) !important;
+  color: #f4f6fb !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 12px !important;
+  text-align: center !important;
+}
+
+.hg-login-qr-mask.is-hidden {
+  display: none !important;
+}
+
+.hg-login-avatar {
+  width: 58px !important;
+  height: 58px !important;
+  border-radius: 50% !important;
+  border: 2px solid #25f4ee !important;
+  object-fit: cover !important;
+}
+
+.hg-login- avatar.is-hidden,
+.hg-login-avatar.is-hidden {
+  display: none !important;
+}
+
+.hg-login-mask-title {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+}
+
+.hg-login-mask-sub {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #ff7a93 !important;
+}
+
+.hg-login-qr-status {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #ff7a93 !important;
+  text-align: center !important;
+  line-height: 1.3 !important;
+}
+
+.hg-login-qr-status.is-ready {
+  color: #25f4ee !important;
+}
+
+.hg-login-info-col {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+}
+
+.hg-login-steps {
+  padding: 8px 12px !important;
+  border-radius: 12px !important;
+  background: #000000 !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.18) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+}
+
+.hg-login-steps-title {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #25f4ee !important;
+  margin-bottom: 1px !important;
+}
+
+.hg-login-step-item {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #f4f6fb !important;
+  line-height: 1.3 !important;
+}
+
+.hg-login-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+}
+
+.hg-login-btn {
+  width: 100% !important;
+  min-height: 36px !important;
+  padding: 5px 12px !important;
+  border-radius: 10px !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  background: #000000 !important;
+  color: #f4f6fb !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  text-align: left !important;
+  cursor: pointer !important;
+}
+
+.hg-login-btn-val {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #ff7a93 !important;
+  white-space: nowrap !important;
+}
+
+/* Fullscreen QR Code Mode (640x507 CSS px / 480x380 physical px) */
+.hg-login-qr-card {
+  cursor: pointer !important;
+}
+
+#hg-login-stage.is-qr-fullscreen {
+  padding: 8px 12px !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#hg-login-stage.is-qr-fullscreen .hg-login-header,
+#hg-login-stage.is-qr-fullscreen .hg-login-info-col {
+  display: none !important;
+}
+
+#hg-login-stage.is-qr-fullscreen .hg-login-body {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#hg-login-stage.is-qr-fullscreen .hg-login-qr-col {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  padding: 0 !important;
+  gap: 10px !important;
+  background: #000000 !important;
+}
+
+#hg-login-stage.is-qr-fullscreen .hg-login-qr-card {
+  width: 436px !important;
+  height: 436px !important;
+  padding: 16px !important;
+  border-radius: 18px !important;
+  border: 3px solid #f35d7b !important;
+  box-shadow: 0 0 24px rgba(243, 93, 123, 0.55) !important;
+}
+
+#hg-login-stage.is-qr-fullscreen .hg-login-qr-status {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: #f4f6fb !important;
+  background: #000000 !important;
+  padding: 4px 16px !important;
+  border-radius: 999px !important;
+  border: 1.5px solid #f35d7b !important;
+}
+
+/* ==================== Native SMS/Password Login Modal Adaptation (640x507) ==================== */
+html.hg-native-passthrough [id^="login-full-panel"] {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 640px !important;
+  height: 507px !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  background: #000000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 2147483630 !important;
+  overflow: hidden !important;
+}
+
+html.hg-native-passthrough [id^="login-full-panel"] > div {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #000000 !important;
+}
+
+html.hg-native-passthrough #login-panel-new,
+html.hg-native-passthrough #douyin_login_comp_h5_panel {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  zoom: 1 !important;
+  width: auto !important;
+  max-width: 580px !important;
+  height: auto !important;
+  max-height: 468px !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  border-radius: 14px !important;
+  border: 1.5px solid #f35d7b !important;
+  box-shadow: 0 0 18px rgba(243, 93, 123, 0.35) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+html.hg-native-passthrough #login-panel-new picture,
+html.hg-native-passthrough #douyin_login_comp_flat_panel > picture {
+  display: none !important;
+}
+
+html.hg-native-passthrough #douyin_login_comp_flat_panel {
+  width: auto !important;
+  max-width: 560px !important;
+  height: auto !important;
+  max-height: 456px !important;
+  min-height: 0 !important;
+  padding: 12px 18px !important;
+  box-sizing: border-box !important;
+}
+
+/* Waveguide dark-theme single-column SMS/Password login view (640x507) */
+html.hg-native-passthrough.hg-native-sms-login #login-panel-new,
+html.hg-native-passthrough.hg-native-sms-login #douyin_login_comp_flat_panel,
+html.hg-native-passthrough.hg-native-sms-login #douyin-login-new-id,
+html.hg-native-passthrough.hg-native-sms-login .aBWY4Mqx,
+html.hg-native-passthrough.hg-native-sms-login .vLD4AnRP {
+  background: #000000 !important;
+  color: #ffffff !important;
+  width: 396px !important;
+  max-width: 396px !important;
+}
+
+html.hg-native-passthrough.hg-native-sms-login #douyin_login_landing_flat_container > div:first-child,
+html.hg-native-passthrough.hg-native-sms-login #douyin_login_comp_scan_code,
+html.hg-native-passthrough.hg-native-sms-login .ZKVC3H8u {
+  display: none !important;
+}
+
+html.hg-native-passthrough.hg-native-sms-login #douyin_login_landing_flat_container {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+html.hg-native-passthrough.hg-native-sms-login #douyin_login_landing_flat_container > div:last-child,
+html.hg-native-passthrough.hg-native-sms-login .wtBAxcgZ {
+  width: 332px !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+html.hg-native-passthrough.hg-native-sms-login #douyin_login_comp_flat_panel_title {
+  color: #ffffff !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+}
+
+html.hg-native-passthrough.hg-native-sms-login .UXzkscqE span {
+  color: #f4f6fb !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+}
+
+html.hg-native-passthrough.hg-native-sms-login #douyin_login_comp_normal_input_id,
+html.hg-native-passthrough.hg-native-sms-login #douyin_login_comp_button_input_id {
+  width: 320px !important;
+  height: 46px !important;
+  background: #101116 !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
+  border-radius: 10px !important;
+}
+
+html.hg-native-passthrough.hg-native-sms-login #login-panel-new input {
+  color: #ffffff !important;
+  background: transparent !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+html.hg-native-passthrough.hg-native-sms-login .gKXDWaPG {
+  color: #25f4ee !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+}
+
+html.hg-native-passthrough.hg-native-sms-login #douyin_login_comp_btn_id {
+  width: 320px !important;
+  height: 44px !important;
+  line-height: 44px !important;
+  background: #fe2c55 !important;
+  color: #ffffff !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  border-radius: 10px !important;
+  text-align: center !important;
+}
+
+html.hg-native-passthrough.hg-native-sms-login .WJzxGFu1 span,
+html.hg-native-passthrough.hg-native-sms-login .WJzxGFu1 a {
+  color: #b8beca !important;
+  font-size: 12px !important;
+}
+
+
+
+/* Bottom controls keep the video playing while navigating actions. */
+.hg-bottom-menu { position:absolute; left:0; right:0; bottom:0; padding:8px 0; background:rgba(0,0,0,.94); border:0; border-radius:0; z-index:18; }
+.hg-bottom-menu.is-hidden { display:none !important; }
+.hg-bottom-hint { font-size:16px; color:#ccc; margin-bottom:10px; }
+.hg-bottom-list { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:10px; }
+.hg-bottom-item { min-height:48px; padding:8px 4px; background:transparent; border:2px solid transparent; border-radius:8px; color:white; font-size:20px; font-weight:700; }
+.hg-comments { max-height:230px; overflow-y:auto; font-size:21px; line-height:1.5; margin-bottom:12px; }
+.hg-comment-row { padding:8px 0; border-bottom:1px solid #555; }
+
+.hg-bottom-list.is-submenu { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.hg-bottom-item { display:flex; align-items:center; justify-content:center; min-height:58px; }
+.hg-bottom-icon { width:32px; height:32px; display:block; pointer-events:none; }
+.hg-bottom-item.is-active { color:#ff6688; }
+
+#hg-douyin-root .hg-bottom-item.is-focused { box-shadow:none !important; transform:none; }
+
+
+/* 云台防抖开启（原生 GimbalStabilizer）：视频强制纹理化（own layer），确保进入离屏采样纹理。
+   与原生侧 LAYER_TYPE_HARDWARE + alpha 0.99 共同构成三保险。 */
+html.hg-gimbal video { transform: translateZ(0) !important; will-change: transform !important; }

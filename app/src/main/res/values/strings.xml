@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">抖音眼镜版</string>
+    <string name="error_network_title">网络连接不可用</string>
+    <string name="error_network_message">请检查网络设置后重试</string>
+    <string name="error_retry_hint">单击触摸板或「重试」按钮</string>
+    <string name="retry">重试</string>
+
+    <!-- 眼镜手势 HUD 提示 -->
+    <string name="hud_play_pause">播放 / 暂停</string>
+    <string name="hud_mute">静音切换</string>
+    <string name="hud_next">下一个视频</string>
+    <string name="hud_prev">上一个视频</string>
+    <string name="hud_back">返回</string>
+    <string name="hud_retry">重试</string>
+    <string name="hud_glasses_off">已摘下眼镜，暂停播放</string>
+    <string name="hud_item_next">下一个</string>
+    <string name="hud_item_prev">上一个</string>
+    <string name="hud_open">打开选中项</string>
+    <string name="hud_pick">已框选，单击打开</string>
+    <string name="hud_no_focus">无可导航内容</string>
+    <string name="hud_bar_show">播控栏已显示</string>
+    <string name="hud_bar_hide">播控栏已隐藏</string>
+    <string name="hud_menu_open">快捷菜单</string>
+    <string name="hud_menu_close">关闭菜单</string>
+    <string name="hud_fav_on">★ 已加入收藏</string>
+    <string name="hud_fav_off">已取消收藏</string>
+    <string name="hud_speed">倍速已切换</string>
+    <string name="hud_browse">打开视频网格</string>
+    <string name="hud_seek_b">快退10秒</string>
+    <string name="hud_seek_f">快进10秒</string>
+    <string name="hud_switching">正在切换…</string>
+    <string name="hud_vol_up">音量 +</string>
+    <string name="hud_vol_down">音量 -</string>
+    <string name="hud_exit_confirm">再次双击退出抖音</string>
+    <string name="hud_autonext_on">自动连播：已开启</string>
+    <string name="hud_autonext_off">自动连播：已关闭</string>
+    <string name="hud_gimbal_on">云台防抖：已开启</string>
+    <string name="hud_gimbal_off">云台防抖：已关闭</string>
+    <string name="hud_gimbal_fail">云台防抖不可用：缺少姿态传感器</string>
+    <string name="hud_login_mode">抖音扫码登录</string>
+    <string name="hud_sms_login_mode">验证码 / 密码登录</string>
+    <string name="hud_qr_refresh">正在刷新二维码…</string>
+    <string name="hud_qr_zoom_in">二维码已放大 · 单击缩小</string>
+    <string name="hud_qr_zoom_out">二维码已还原</string>
+</resources>
