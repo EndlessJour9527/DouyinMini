@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "agentName": "抖音短视频",
+  "agentDesc": "打开抖音推荐短视频并连续观看，支持上下滑动切换视频、单击隐藏标题和全屏显示。",
+  "agentPrompt": "用户表达打开抖音、刷抖音、刷短视频、看抖音推荐视频等意图时，调用无参数工具 pages/index/index 打开推荐播放器。页面自行获取推荐视频，无需用户提供视频地址或其他参数。全屏、视频切换与标题显隐由用户在播放器内操作。能力范围为推荐视频播放。",
+  "agentLogo": "",
+  "nativeVersion": "1.0.0",
+  "inkVersion": ">=0.20.0",
+  "permissions": [
+    "INTERNET"
+  ]
+}
